@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  S3 chat bucket for one user. Allows anyone to upload only to 'received-messages/' folder.
+
+Parameters:
+  UserBucketName:
+    Type: String
+    Description: Enter the unique S3 bucket name for this user (e.g. userA-chat-bucket)
+
+Resources:
+  UserChatBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref UserBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      VersioningConfiguration:
+        Status: Enabled
+
+  UserChatBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref UserChatBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowAnyoneToUploadToReceivedMessages
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource: !Sub "${UserChatBucket.Arn}/received-messages/*"
+
+Outputs:
+  BucketName:
+    Description: Name of this user's chat bucket
+    Value: !Ref UserChatBucket

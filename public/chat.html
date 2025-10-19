@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>S3 Chat App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f3f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 400px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #0078d7;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      font-size: 18px;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .chat-footer {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      border-top: 1px solid #ccc;
+    }
+
+    input, textarea, button {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #0078d7;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    #status {
+      color: green;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">S3 Chat</div>
+    <div class="chat-body" id="chat-body">
+      <div>Enter receiver's S3 bucket and message below:</div>
+    </div>
+    <div class="chat-footer">
+      <input id="receiver" placeholder="Receiver S3 bucket name" />
+      <textarea id="message" placeholder="Type a message..."></textarea>
+      <button id="sendBtn">Send</button>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById("sendBtn");
+    const receiver = document.getElementById("receiver");
+    const message = document.getElementById("message");
+    const status = document.getElementById("status");
+
+    sendBtn.onclick = async () => {
+      const receiverBucket = receiver.value.trim();
+      const msg = message.value.trim();
+
+      if (!receiverBucket || !msg) {
+        alert("Please enter receiver bucket and message");
+        return;
+      }
+
+      status.textContent = "Sending...";
+
+      try {
+        const response = await fetch("/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `receiverBucket=${encodeURIComponent(receiverBucket)}&message=${encodeURIComponent(msg)}`
+        });
+
+        const text = await response.text();
+        status.textContent = text.startsWith("✅") ? "✅ Message sent!" : text;
+        message.value = "";
+      } catch (err) {
+        status.textContent = "❌ Error sending message";
+      }
+    };
+  </script>
+</body>
+</html>

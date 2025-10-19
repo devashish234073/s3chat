@@ -1,0 +1,12 @@
+{
+  "name": "s3-chat",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "commonjs",
+  "dependencies": {
+    "aws-sdk": "^2.1515.0",
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "uuid": "^9.0.1"
+  }
+}
